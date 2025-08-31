@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI StoryBook Generator</title>
+    <link rel="stylesheet" href="/public/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎨 AI StoryBook Generator</h1>
+            <p>Transform your stories into beautifully illustrated storybooks using AI</p>
+        </header>
+
+        <div class="tabs">
+            <button class="tab-button active" data-tab="generate">Generate New</button>
+            <button class="tab-button" data-tab="library">My StoryBooks</button>
+            <button class="tab-button" data-tab="settings">Settings</button>
+        </div>
+
+        <div class="tab-content" id="generate-tab">
+            <div class="form-container">
+                <div class="form-group">
+                    <label for="story-input">Paste Your Story Here</label>
+                    <textarea 
+                        id="story-input" 
+                        placeholder="Once upon a time, in a magical forest..."
+                        rows="10"
+                    ></textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="style-select">Art Style</label>
+                        <select id="style-select">
+                            <option value="realistic">Realistic</option>
+                            <option value="cartoon">Cartoon</option>
+                            <option value="anime">Anime</option>
+                            <option value="watercolor">Watercolor</option>
+                            <option value="oil-painting">Oil Painting</option>
+                            <option value="upload">Upload Reference Image</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group" id="upload-section" style="display: none;">
+                        <label for="reference-upload">Upload Reference Image</label>
+                        <input type="file" id="reference-upload" accept=".jpg,.jpeg,.png,.webp">
+                        <div id="upload-preview" style="display: none;">
+                            <img id="preview-image" style="max-width: 200px; max-height: 200px; border-radius: 8px; margin-top: 10px;">
+                            <p id="upload-status"></p>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="audience-select">Target Audience</label>
+                        <select id="audience-select">
+                            <option value="children">Children</option>
+                            <option value="young-adult">Young Adult</option>
+                            <option value="adult">Adult</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="advanced-settings">
+                    <button class="toggle-advanced">⚙️ Advanced Settings</button>
+                    <div class="advanced-content" style="display: none;">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>
+                                    <input type="checkbox" id="use-google-ref" checked>
+                                    Use Google AI for reference images
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="width-input">Image Width</label>
+                                <input type="number" id="width-input" value="1024" min="512" max="2048">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="height-input">Image Height</label>
+                                <input type="number" id="height-input" value="1024" min="512" max="2048">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="steps-input">Inference Steps</label>
+                                <input type="number" id="steps-input" value="50" min="20" max="100">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="guidance-input">Guidance Scale</label>
+                                <input type="number" id="guidance-input" value="7.5" min="1" max="20" step="0.5">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="model-select">Replicate Model</label>
+                            <select id="model-select">
+                                <option value="ideogram-ai/ideogram-v3-turbo">Ideogram V3 Turbo (Default)</option>
+                                <option value="auto-character">Smart Character Mode (Auto Nave/Lia names)</option>
+                                <option value="stability-ai/sdxl:39ed52f2a78e934b3ba6e2a89f5b1c712de7dfea535525255b1aa35c5565e08b">SDXL</option>
+                                <option value="stability-ai/stable-diffusion:db21e45d3f7023abc2a46ee38a23973f6dce16bb082a930b0c49861f96d1e5bf">Stable Diffusion 2.1</option>
+                                <option value="prompthero/openjourney:9936c2001faa2194a261c01381f90e65261879985476014a0a37a334593a05eb">OpenJourney</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="aspect-ratio-select">Aspect Ratio (for Ideogram models)</label>
+                            <select id="aspect-ratio-select">
+                                <option value="1:1">Square (1:1)</option>
+                                <option value="3:2">Landscape (3:2)</option>
+                                <option value="4:3">Standard (4:3)</option>
+                                <option value="16:9">Widescreen (16:9)</option>
+                                <option value="2:3">Portrait (2:3)</option>
+                                <option value="3:4">Tall (3:4)</option>
+                                <option value="9:16">Vertical (9:16)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <button id="generate-btn" class="generate-button">
+                    <span class="button-text">Generate StoryBook</span>
+                    <div class="loader" style="display: none;"></div>
+                </button>
+
+                <div id="progress-container" style="display: none;">
+                    <div class="progress-bar">
+                        <div class="progress-fill"></div>
+                    </div>
+                    <p class="progress-text">Analyzing story...</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="library-tab" style="display: none;">
+            <div class="storybooks-grid" id="storybooks-container">
+                <p>Loading your storybooks...</p>
+            </div>
+        </div>
+
+        <div class="tab-content" id="settings-tab" style="display: none;">
+            <div class="settings-container">
+                <h2>API Configuration Status</h2>
+                <div id="api-status">
+                    <p>Checking API keys...</p>
+                </div>
+                
+                <div class="info-box">
+                    <h3>Setup Instructions</h3>
+                    <ol>
+                        <li>Copy the <code>.env.example</code> file to <code>.env</code></li>
+                        <li>Add your Google AI Studio API key for story analysis and reference images</li>
+                        <li>Add your Replicate API token for final image generation</li>
+                        <li>Restart the server after adding API keys</li>
+                    </ol>
+                    
+                    <div class="info-note" style="background: #e7f3ff; padding: 15px; border-radius: 8px; margin-top: 15px; border-left: 4px solid #2196F3;">
+                        <strong>Simplified Setup!</strong> Now only requires 2 API keys:
+                        <ul style="margin-top: 8px;">
+                            <li><strong>Google AI Studio:</strong> Powers both story analysis (Gemini) and reference images</li>
+                            <li><strong>Replicate:</strong> Generates high-quality final illustrations</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="result-container" style="display: none;">
+            <h2>StoryBook Generated!</h2>
+            <div class="result-actions">
+                <a id="view-storybook" href="#" target="_blank" class="button">View StoryBook</a>
+                <button id="new-story" class="button secondary">Create Another</button>
+            </div>
+            <div id="preview-container"></div>
+        </div>
+    </div>
+
+    <script src="/public/js/app.js"></script>
+</body>
+</html>

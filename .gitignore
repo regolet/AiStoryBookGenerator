@@ -1,0 +1,17 @@
+node_modules/
+dist/
+.env
+.env.local
+.DS_Store
+*.log
+uploads/*
+!uploads/.gitkeep
+output/*
+!output/.gitkeep
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.cache/
+temp/
